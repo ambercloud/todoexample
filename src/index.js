@@ -38,7 +38,7 @@ class TaskItem extends React.Component {
     }
 
     handleStatusChange(event) {
-        this.props.onStatusChange(this.props.index);
+        this.props.onStatusChange(this.props.task.id);
         event.preventDefault();
     }
 
@@ -55,7 +55,7 @@ class TasksList extends React.Component {
 
     render() {
         const items = this.props.items;
-        const listItems = items.map((item, i) => <TaskItem task={item} index={i} onStatusChange={this.props.onStatusChange} />);
+        const listItems = items.map(item => <TaskItem task={item} onStatusChange={this.props.onStatusChange} />);
         return(
             <ul>
                 {listItems}
@@ -89,13 +89,11 @@ class TodoList extends React.Component {
     }
 
 
-    handleTaskStatusChange(index) {
-        const newStatus = !(this.state.tasksList[index].isCompleted);
-        const taskChanged = Object.assign(this.state.tasksList[index],{isCompleted: newStatus});
-        const firstPart = this.state.tasksList.slice(0,index);
-        const lastPart = this.state.tasksList.slice(index+1);
-        const newList = firstPart.concat(taskChanged,lastPart);
-        this.setState({tasksList: newList});
+    handleTaskStatusChange(idOfItemToChange) {
+        const newTasksList = this.state.tasksList.slice();
+        const index = newTasksList.findIndex(task => task.id === idOfItemToChange);
+        newTasksList[index].isCompleted = !(newTasksList[index].isCompleted);
+        this.setState({tasksList: newTasksList});
     }
 
     render() {
