@@ -52,14 +52,47 @@ class TaskItem extends React.Component {
 
 
 class TasksList extends React.Component {
+    
+    constructor(props) {
+        super(props);
+        this.state = {filter: 'all'};
+        this.changeFilter = this.changeFilter.bind(this);
+    }
+
+    changeFilter(newFilter) {
+        this.setState({filter: newFilter});
+    }
+
+    filterTasks(tasks, filter) {
+        switch (filter) {
+            case 'all':
+                return tasks;
+            case 'active':
+                return tasks.filter(task => task.isCompleted === false);
+            case 'completed':
+                return tasks.filter(task => task.isCompleted === true);
+            default:
+                console.log('error: filter is invalid');
+        }
+    }
 
     render() {
-        const items = this.props.items;
-        const listItems = items.map(item => <TaskItem task={item} onStatusChange={this.props.onStatusChange} />);
+        const tasks = this.filterTasks(this.props.items, this.state.filter);
+        const listItems = tasks.map(item => <TaskItem task={item} onStatusChange={this.props.onStatusChange} />);
+        const filterSelector = (
+            <div>
+                <button onClick={() => this.changeFilter('all')} filter='all'>All</button>
+                <button onClick={() => this.changeFilter('active')} filter='active'>Active</button>
+                <button onClick={() => this.changeFilter('completed')} filter='completed'>Completed</button>
+            </div>
+        );
         return(
-            <ul>
-                {listItems}
-            </ul>
+            <div>
+                <ul>
+                    {listItems}
+                </ul>
+                {filterSelector}
+            </div>
         );
     }
 }
@@ -83,8 +116,7 @@ class TodoList extends React.Component {
     handleTaskInputSubmit() {
         if (this.state.taskInputValue) {
             const newtask = {description: this.state.taskInputValue, id: Date.now(), isCompleted: false }
-            this.setState({tasksList: this.state.tasksList.concat(newtask)});
-            this.setState({taskInputValue: ''});
+            this.setState({tasksList: this.state.tasksList.concat(newtask), taskInputValue: ''});
         }
     }
 
